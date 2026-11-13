@@ -40,9 +40,11 @@ A organização vazia criada anteriormente não foi apagada ou alterada.
    35 Client, 19 Employee e 3.465 ScheduleEntry: 7.826 registros. Zero IDs
    duplicados e zero vínculos órfãos dos agendamentos. As exportações ocorreram
    separadamente; não representam um snapshot transacional simultâneo.
-3. **Preparar Supabase — iniciado.** Configuração local e migration de staging
-   privado disponíveis. A migration NÃO foi aplicada nem ensaiada em banco.
-   Docker não estava ativo nesta máquina. Não há tabelas públicas do produto ainda.
+3. **Preparar Supabase — iniciado.** Configuração, staging privado e modelo do
+   produto estão escritos. Replay limpo, upgrade do staging, RLS e importação foram
+   ensaiados em PostgreSQL/WASM descartável, com bootstrap de Auth simulado.
+   Docker não estava ativo. Nada foi aplicado no Supabase remoto; bootstrap completo
+   Supabase, Auth/JWT reais, Data API e deploy continuam pendentes.
    Próximo passo: o usuário concluir a entrada na conta `varejarteagenda@gmail.com`
    e então autenticar um perfil próprio do projeto. Não usar a sessão global existente
    nem alterar faturamento, acessos ou projetos de outras aplicações. Confirmar
@@ -87,11 +89,18 @@ Nenhuma conta foi criada e nenhum convite ou e-mail foi enviado.
 
 - `npm run build`: passou com o código recuperado. Isso comprova compilação;
   as chamadas de dados e autenticação ainda usam Base44.
-- Testes de preparação: quatro passaram (preservação, credenciais, órfãos e duplicados).
+- Testes Python: nove passaram (preparação e conversões de dados).
+- Testes SQL locais: 11 passaram, cobrindo os três perfis, conta sem vínculo,
+  colaborador desativado, acesso anônimo, upgrade do staging, datas sem deslocamento
+  e com microssegundos, importação atômica, repetição sem sobrescrita e recusa de
+  destino já populado. Fixtures usam identidades sintéticas, não sessões reais.
 - Validação dos CSVs reais: passou; inventário agregado em `data-inventory.json`.
+- Importação dos 7.826 registros em PostgreSQL/WASM descartável: paridade de todos
+  os campos projetados, valores financeiros privados, contatos e snapshots
+  sanitizados conferida; nova execução preservou uma edição posterior simulada.
 - `npm run lint`: 50 erros preexistentes, todos de imports não utilizados.
   Mantidos para preservar a origem, sem limpeza geral durante a recuperação.
-- Replay SQL, upgrade, políticas de acesso e importação remota: pendentes.
+- Replay da stack Supabase completa, Auth/API reais e importação remota: pendentes.
 - Teste completo da aplicação fora do Base44: pendente.
 
 ## Retorno ao estado anterior
