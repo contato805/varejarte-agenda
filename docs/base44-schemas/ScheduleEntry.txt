@@ -1,0 +1,44 @@
+Editor de esquema
+employee_id
+ID do colaborador
+text
+required
+employee_name
+Nome do colaborador (desnormalizado)
+text
+client_id
+ID do cliente
+text
+required
+client_name
+Nome do cliente (desnormalizado)
+text
+activity
+Descrição da atividade
+text
+required
+date
+Data da atividade
+date
+required
+start_time
+Horário de início (HH:mm)
+text
+required
+end_time
+Horário de término (HH:mm)
+text
+required
+notes
+Observações adicionais
+text
+employee_color
+Cor do colaborador (hex)
+text
+status
+Status da atividade
+text
+
+Default: "agendado"
+
+Options: agendado, realizado, cancelado

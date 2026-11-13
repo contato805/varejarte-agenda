@@ -1,0 +1,19 @@
+Editor de esquema
+action
+Descrição da ação realizada
+text
+required
+category
+Categoria da ação
+text
+required
+
+Options: colaborador, cliente, atividade, agendamento, relatorio, cronograma
+
+user_name
+Nome do usuário que realizou a ação
+text
+required
+details
+Detalhes adicionais
+text

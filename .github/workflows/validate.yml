@@ -1,0 +1,23 @@
+name: Validate recovered project
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+        env:
+          VITE_BASE44_APP_ID: 69ac93e375e4e4093788aef0
+          VITE_BASE44_APP_BASE_URL: https://varejarte-agenda.base44.app
+          VITE_BASE44_FUNCTIONS_VERSION: prod
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s scripts -p 'test_*.py' -v

@@ -1,0 +1,47 @@
+Editor de esquema
+name
+Nome do colaborador
+text
+required
+color
+Cor de identificação do colaborador (hex)
+text
+required
+role
+Cargo do colaborador
+text
+active
+Se o colaborador está ativo
+boolean
+
+Default: true
+
+access_type
+Tipo de acesso: admin = acesso total, supervisor = visualiza todas as agendas sem editar, viewer = somente visualização da própria agenda
+text
+
+Default: "viewer"
+
+Options: admin, supervisor, viewer
+
+login
+Login de acesso do colaborador
+text
+password
+Senha de acesso do colaborador
+text
+monthly_salary
+Salário mensal (base de cálculo do custo/hora)
+number
+birthday_day
+Dia do aniversário
+number
+birthday_month
+Mês do aniversário (1-12)
+number
+session_token
+Token de sessão ativo (gerenciado pelo sistema)
+text
+session_expires
+Data de expiração da sessão (ISO)
+text

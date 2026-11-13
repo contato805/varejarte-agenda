@@ -1,0 +1,63 @@
+Editor de esquema
+company_name
+Nome da empresa cliente
+text
+required
+active
+Se o cliente está ativo
+boolean
+
+Default: true
+
+monthly_contract_value
+Valor do contrato mensal (receita estimada)
+number
+contacts
+Lista de contatos da empresa
+array
+name
+text
+phone
+text
+email
+text
+birthday_day
+number
+birthday_month
+number
+branches
+Filiais/unidades de negócio do cliente
+array
+name
+Nome da filial
+text
+address
+Endereço da filial
+text
+active
+Se a filial está ativa
+boolean
+
+Default: true
+
+monthly_activities
+Atividades mensais previstas para esta filial
+array
+activity_type
+text
+quantity
+number
+duration_minutes
+number
+monthly_activities
+Atividades mensais previstas para o cliente (geral)
+array
+activity_type
+text
+quantity
+number
+duration_minutes
+number
+activity_notes
+Observações sobre o cliente
+text

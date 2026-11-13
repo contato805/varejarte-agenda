@@ -1,39 +1,36 @@
-**Welcome to your Base44 project** 
+# Varejarte Agenda
 
-**About**
+Migração do aplicativo Base44 para desenvolvimento local, GitHub e Supabase.
 
-View and Edit  your app on [Base44.com](http://Base44.com) 
+**Estado atual:** os 143 arquivos originais foram recuperados sem plano pago,
+e o frontend compila localmente. A autenticação e os dados ainda usam Base44;
+o aplicativo ainda não foi convertido para Supabase nem publicado em outra hospedagem.
 
-This project contains everything you need to run your app locally.
+## Desenvolvimento
 
-**Edit the code in your local development environment**
+Requisitos: Node.js 22 ou superior e npm.
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
-
-**Prerequisites:** 
-
-1. Clone the repository using the project's Git URL 
-2. Navigate to the project directory
-3. Install dependencies: `npm install`
-4. Create an `.env.local` file and set the right environment variables
-
-```
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=your_backend_url
-
-e.g.
-VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
-VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
+```sh
+npm ci
+cp .env.example .env.local
+npm run dev
 ```
 
-Run the app: `npm run dev`
+O acesso ao backend Base44 continua sujeito às sessões e permissões da origem.
+`npm run build` verifica a compilação, sem comprovar login ou consultas no destino.
 
-**Publish your changes**
+## Migração
 
-Open [Base44.com](http://Base44.com) and click on Publish.
+[Estado e próximos passos](docs/MIGRATION.md), [inventário do código](docs/source-manifest.json)
+e [inventário agregado dos dados](docs/data-inventory.json).
 
-**Docs & Support**
+Os backups reais ficam em `.migration/`, fora do Git. Senhas e tokens não devem
+entrar no repositório, nas variáveis do frontend nem em artefatos de CI.
 
-Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
+```sh
+python3 -m unittest discover -s scripts -p 'test_*.py' -v
+```
 
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+O esquema privado de staging Supabase foi preparado e ainda não foi aplicado.
+O modelo de dados do produto e suas permissões serão definidos na conversão.
+O README exportado da origem foi preservado em `docs/BASE44-README.md`.

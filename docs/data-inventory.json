@@ -1,0 +1,36 @@
+{
+  "entities": {
+    "ActivityType": {
+      "rows": 41,
+      "sha256": "6935b1971e1dc7fd02def0b8b553f1db4f4ed632af3d2d87faceadf5ed34668d"
+    },
+    "AuditLog": {
+      "rows": 4266,
+      "sha256": "cfe4c35a3eee050c52a35433cf7c1992d2ad8c7496296e789fa2c2f22968b09c"
+    },
+    "Client": {
+      "rows": 35,
+      "sha256": "3397f54641ca908382f5f96b1f53bf58c47a6904d337a255895332498f871a56"
+    },
+    "Employee": {
+      "rows": 19,
+      "sha256": "60124198363d8ff6b1204ffb8af7f8dd79c38468d7a927e2f357ebcfb33b1bed"
+    },
+    "ScheduleEntry": {
+      "rows": 3465,
+      "sha256": "33f8f4c5012f4e543e7825a5dd6b1a17acec20400ef674fa9333b99183c92dc7"
+    }
+  },
+  "total_records": 7826,
+  "duplicate_ids": 0,
+  "unresolved_schedule_references": 0,
+  "credentials_removed": [
+    "access_token",
+    "password",
+    "refresh_token",
+    "session_expires",
+    "session_token"
+  ],
+  "format": "CSV values preserved as strings; structured parsing deferred",
+  "status": "validated_local_snapshot_only"
+}
