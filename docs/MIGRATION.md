@@ -8,8 +8,17 @@ funções e três workflows. Hashes do original em `source-manifest.json`.
 O projeto local tem Git próprio, separado do repositório da pasta superior.
 
 Destino do código: https://github.com/contato805/varejarte-agenda (privado).
-Destino dos dados: projeto Supabase exclusivo; organização ainda a definir.
+Destino dos dados: projeto Supabase exclusivo na organização **Varejarte**, criada
+no plano gratuito em 13/11/2026 (`hptgenccwkznoahivtab`). A criação do projeto
+`varejarte-agenda` em São Paulo foi recusada pelo Supabase por uma pendência de
+cobrança em outra organização da conta. A listagem posterior confirmou que nenhum
+projeto Varejarte foi provisionado. Não houve alteração de plano nem pagamento.
 Nenhum projeto Maestro ou Deskcomm foi alterado.
+
+**Restrição do usuário:** o aplicativo Base44 está em uso pela equipe e deve
+permanecer integralmente intacto. A origem é somente leitura; desenvolvimento e
+testes com escrita devem ocorrer apenas nas cópias isoladas. A troca do aplicativo
+em uso depende de autorização explícita. Essa regra também consta em `AGENTS.md`.
 
 ## Fluxo e critérios de avanço
 
@@ -22,6 +31,11 @@ Nenhum projeto Maestro ou Deskcomm foi alterado.
 3. **Preparar Supabase — iniciado.** Configuração local e migration de staging
    privado disponíveis. A migration NÃO foi aplicada nem ensaiada em banco.
    Docker não estava ativo nesta máquina. Não há tabelas públicas do produto ainda.
+   Organização Varejarte criada; provisionamento remoto bloqueado pela conta.
+   Próximo passo: regularizar a pendência pelo painel Supabase e então criar o
+   projeto nessa organização, mantendo o plano gratuito. Não repetir a criação
+   enquanto a condição externa persistir; antes de tentar, listar os projetos
+   para evitar duplicação. Não remover ou pausar outros projetos para abrir espaço.
 4. **Migrar o backend — pendente.** Adaptar entidades, `clientCrud`, importação,
    login/sessão e chamadas Base44, preservando IDs, filiais, filtros e relatórios.
 5. **Migrar as rotinas — pendente.** Conclusão automática, sincronização do nome
