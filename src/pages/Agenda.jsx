@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { addMonths, subMonths, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -13,14 +13,12 @@ import AgendaSummary from "../components/calendar/AgendaSummary";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Clock, Building2, User, Plus, Download, Pencil, CheckCircle, XCircle, Trash2, AlertTriangle } from "lucide-react";
+import { Building2, User, Plus, Download, Pencil, CheckCircle, XCircle, Trash2, AlertTriangle } from "lucide-react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { SelectItem } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
 import { downloadAgendaPDF } from "@/utils/agendaPdf";
 import PullToRefresh from "@/components/ui/PullToRefresh";
 import MobileSelect from "@/components/ui/MobileSelect";
@@ -29,15 +27,10 @@ import { logAction } from "@/lib/auditLog";
 import NewEntryDrawer from "@/components/entry/NewEntryDrawer";
 import ClientSearchSelect from "@/components/entry/ClientSearchSelect";
 
-function getEmployeeSession() {
-  try {
-    const raw = sessionStorage.getItem("employeeSession");
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
-}
+import { useAuth } from "@/lib/AuthContext";
 
 export default function Agenda() {
-  const empSession = getEmployeeSession();
+  const { user: empSession } = useAuth();
   const isViewer = empSession && empSession.access_type === "viewer";
   const isSupervisor = empSession && empSession.access_type === "supervisor";
   const isReadOnly = isViewer || isSupervisor;
@@ -47,7 +40,7 @@ export default function Agenda() {
   const [editForm, setEditForm] = useState({});
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.ScheduleEntry.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.ScheduleEntry.update(id, data),
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: ["entries"] });
       const previous = queryClient.getQueryData(["entries"]);
@@ -138,10 +131,10 @@ export default function Agenda() {
   const [newEntryDate, setNewEntryDate] = useState("");
   const [confirmDeleteEntry, setConfirmDeleteEntry] = useState(null);
 
-  const isFullAdmin = !isReadOnly; // platform user or employee admin — same logic as layout
+  const isFullAdmin = empSession?.access_type === "admin";
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.ScheduleEntry.delete(id),
+    mutationFn: (id) => api.entities.ScheduleEntry.delete(id),
     onSuccess: (_data, id) => {
       queryClient.setQueryData(["entries"], (old) => (old || []).filter((e) => e.id !== id));
       queryClient.invalidateQueries({ queryKey: ["entries"] });
@@ -150,32 +143,22 @@ export default function Agenda() {
 
   const { data: employees = [] } = useQuery({
     queryKey: ["employees"],
-    queryFn: () => base44.entities.Employee.list(),
+    queryFn: () => api.entities.Employee.list(),
   });
 
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
-    queryFn: () => base44.entities.Client.list(),
+    queryFn: () => api.entities.Client.list(),
   });
 
   const { data: rawEntries = [] } = useQuery({
     queryKey: ["entries"],
-    queryFn: async () => {
-      const results = [];
-      let skip = 0;
-      while (true) {
-        const batch = await base44.entities.ScheduleEntry.list("-date", 500, skip);
-        results.push(...batch);
-        if (batch.length < 500) break;
-        skip += 500;
-      }
-      return results;
-    },
+    queryFn: () => api.entities.ScheduleEntry.list("-date"),
   });
 
   const { data: activityTypes = [] } = useQuery({
     queryKey: ["activityTypes"],
-    queryFn: () => base44.entities.ActivityType.list(),
+    queryFn: () => api.entities.ActivityType.list(),
   });
 
   const entries = useMemo(() => normalizeEntryStatus(rawEntries), [rawEntries]);

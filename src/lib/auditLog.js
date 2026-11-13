@@ -1,24 +1,6 @@
-import { base44 } from "@/api/base44Client";
+import { api } from '@/api/client';
 
-export async function logAction({ action, category, details }) {
-  let userName = "Sistema";
-  try {
-    const raw = sessionStorage.getItem("employeeSession");
-    if (raw) {
-      const session = JSON.parse(raw);
-      userName = session.name || "Colaborador";
-    } else {
-      const user = await base44.auth.me();
-      userName = user?.full_name || "Admin";
-    }
-  } catch {
-    userName = "Desconhecido";
-  }
-  
-  return base44.entities.AuditLog.create({
-    action,
-    category,
-    user_name: userName,
-    details: details || "",
-  });
+export function logAction({ action, category, details }) {
+  // Identity is assigned by the server, never by a browser-supplied name.
+  return api.entities.AuditLog.create({ action, category, details: details || '' });
 }

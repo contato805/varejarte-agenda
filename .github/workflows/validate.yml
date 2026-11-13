@@ -1,4 +1,4 @@
-name: Validate recovered project
+name: Validate migration
 on: [push, pull_request]
 permissions:
   contents: read
@@ -13,12 +13,10 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm run build
-        env:
-          VITE_BASE44_APP_ID: 69ac93e375e4e4093788aef0
-          VITE_BASE44_APP_BASE_URL: https://varejarte-agenda.base44.app
-          VITE_BASE44_FUNCTIONS_VERSION: prod
+      - run: npm run lint
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: python -m unittest discover -s scripts -p 'test_*.py' -v
       - run: npm run test:database
+      - run: npm run test:client

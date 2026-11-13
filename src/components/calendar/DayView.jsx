@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { format, isToday, addDays, subDays } from "date-fns";
+import { format, isToday } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, CalendarDays, Download, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { downloadDayPDF, downloadWeekPDF } from "@/utils/dayPdf";

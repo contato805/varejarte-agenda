@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,11 +21,11 @@ export default function ActivityTypes() {
 
   const { data: activityTypes = [], isLoading } = useQuery({
     queryKey: ["activityTypes"],
-    queryFn: () => base44.entities.ActivityType.list(),
+    queryFn: () => api.entities.ActivityType.list(),
   });
 
   const createMut = useMutation({
-    mutationFn: (data) => base44.entities.ActivityType.create(data),
+    mutationFn: (data) => api.entities.ActivityType.create(data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["activityTypes"] });
       setNewName("");
@@ -35,7 +35,7 @@ export default function ActivityTypes() {
   });
 
   const deleteMut = useMutation({
-    mutationFn: (id) => base44.entities.ActivityType.delete(id),
+    mutationFn: (id) => api.entities.ActivityType.delete(id),
     onSuccess: (_data, deletedId) => {
       queryClient.invalidateQueries({ queryKey: ["activityTypes"] });
       queryClient.invalidateQueries({ queryKey: ["scheduleEntries"] });
@@ -47,7 +47,7 @@ export default function ActivityTypes() {
 
   const handleDeleteClick = async (activity) => {
     // Find scheduled entries using this activity
-    const allEntries = await base44.entities.ScheduleEntry.filter({ activity: activity.name });
+    const allEntries = await api.entities.ScheduleEntry.filter({ activity: activity.name });
     const scheduledEntries = allEntries.filter((e) => e.status === "agendado");
 
     if (scheduledEntries.length === 0) {
@@ -64,10 +64,10 @@ export default function ActivityTypes() {
     const activity = replaceDialog.activity;
     // Update each affected entry with new activity
     for (const [entryId, newActivity] of Object.entries(replacements)) {
-      await base44.entities.ScheduleEntry.update(entryId, { activity: newActivity });
+      await api.entities.ScheduleEntry.update(entryId, { activity: newActivity });
     }
     // Delete the activity type
-    await base44.entities.ActivityType.delete(activity.id);
+    await api.entities.ActivityType.delete(activity.id);
     queryClient.invalidateQueries({ queryKey: ["activityTypes"] });
     queryClient.invalidateQueries({ queryKey: ["scheduleEntries"] });
     setIsProcessing(false);
@@ -91,14 +91,14 @@ export default function ActivityTypes() {
     setIsProcessing(true);
     const oldName = activity.name;
     // 1. Update the ActivityType entity
-    await base44.entities.ActivityType.update(activity.id, { name: trimmed });
+    await api.entities.ActivityType.update(activity.id, { name: trimmed });
     // 2. Update all ScheduleEntry records that use the old name
-    const entries = await base44.entities.ScheduleEntry.filter({ activity: oldName });
+    const entries = await api.entities.ScheduleEntry.filter({ activity: oldName });
     for (const entry of entries) {
-      await base44.entities.ScheduleEntry.update(entry.id, { activity: trimmed });
+      await api.entities.ScheduleEntry.update(entry.id, { activity: trimmed });
     }
     // 3. Update client monthly_activities and branch monthly_activities
-    const allClients = await base44.entities.Client.list();
+    const allClients = await api.entities.Client.list();
     for (const client of allClients) {
       let changed = false;
       const updatedActivities = (client.monthly_activities || []).map((a) => {
@@ -113,7 +113,7 @@ export default function ActivityTypes() {
         return { ...b, monthly_activities: updatedBA };
       });
       if (changed) {
-        await base44.entities.Client.update(client.id, { monthly_activities: updatedActivities, branches: updatedBranches });
+        await api.entities.Client.update(client.id, { monthly_activities: updatedActivities, branches: updatedBranches });
       }
     }
     queryClient.invalidateQueries({ queryKey: ["activityTypes"] });

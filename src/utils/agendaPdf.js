@@ -61,7 +61,7 @@ export async function downloadAgendaPDF(entries, currentDate, groupBy, groupLabe
   doc.rect(0, 0, W, 26, "F");
 
   // Logo image
-  const logoUrl = "https://media.base44.com/images/public/69ac93e375e4e4093788aef0/71328dedf_varejartelogotracadobranco.png";
+  const logoUrl = "/brand/varejarte-branco.png";
   try {
     const img = new Image();
     img.crossOrigin = "anonymous";

@@ -1,16 +1,14 @@
-import React, { useMemo, useImperativeHandle, useCallback } from "react";
-import { format, parseISO, subDays } from "date-fns";
+import React, { useMemo } from "react";
+import { format, parseISO } from "date-fns";
 import { formatCurrency } from "@/lib/formatCurrency";
-import { ptBR } from "date-fns/locale";
 import {
-  Building2, User, Clock, Activity, Download, TrendingUp,
+  Building2, User, Clock, Activity, TrendingUp,
   AlertTriangle, CheckCircle2, Zap, DollarSign
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-  PieChart, Pie, Legend
+  PieChart, Pie
 } from "recharts";
 import jsPDF from "jspdf";
 import { normalizeEntryStatus } from "@/lib/normalizeEntryStatus";
@@ -228,7 +226,7 @@ const ReportVarejarteComponent = React.forwardRef(({ entries: rawEntries, client
     doc.rect(0, 0, pageWidth, 38, "F");
 
     try {
-      const logoUrl = "https://media.base44.com/images/public/69ac93e375e4e4093788aef0/71328dedf_varejartelogotracadobranco.png";
+      const logoUrl = "/brand/varejarte-branco.png";
       const img = new Image();
       img.crossOrigin = "anonymous";
       await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject; img.src = logoUrl; });
@@ -821,7 +819,7 @@ const ReportVarejarteComponent = React.forwardRef(({ entries: rawEntries, client
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <img src="https://media.base44.com/images/public/69ac93e375e4e4093788aef0/71328dedf_varejartelogotracadobranco.png" alt="Varejarte" style={{ height: 30 }} />
+        <img src="/brand/varejarte-branco.png" alt="Varejarte" style={{ height: 30 }} />
         <h2 className="text-lg font-bold flex items-center gap-2" style={{ color: '#1e3480' }}>
           <Zap className="w-5 h-5" style={{ color: '#1e3480' }} /> Consolidado Varejarte
         </h2>

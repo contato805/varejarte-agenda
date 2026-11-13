@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { History, Users, Building2, Tag, Calendar, FileText, Map, Loader2, Download } from "lucide-react";
 import { format, parseISO } from "date-fns";
@@ -29,7 +29,7 @@ async function downloadAuditPDF(logs) {
   let xAcc = margin;
   cols.forEach(c => { c.x = xAcc; xAcc += c.w; });
 
-  const LOGO_URL = "https://media.base44.com/images/public/69ac93e375e4e4093788aef0/98ca518dd_Varejarte_logo_png__2_.png";
+  const LOGO_URL = "/brand/varejarte.png";
 
   // Load logo as base64
   let logoData = null;
@@ -155,7 +155,7 @@ export default function AuditHistory() {
 
   const { data: logs = [], isLoading } = useQuery({
     queryKey: ["auditLogs"],
-    queryFn: () => base44.entities.AuditLog.list("-created_date", 200),
+    queryFn: () => api.entities.AuditLog.list("-created_date", 200),
   });
 
   const filtered = filterCategory === "all" ? logs : logs.filter((l) => l.category === filterCategory);

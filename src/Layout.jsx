@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Calendar, LayoutDashboard, FileText, LogOut, Shield, Eye, Settings, Users, Building2, Tag, Sun, Moon, ChevronLeft, Trash2, History, Download } from "lucide-react";
+import { Calendar, LayoutDashboard, FileText, LogOut, Shield, Eye, Settings, Users, Building2, Tag, Sun, Moon, ChevronLeft, History, Download } from "lucide-react";
 
 import MobileNav from "./components/layout/MobileNav";
-import ConfirmDialog from "./components/ui/ConfirmDialog";
+import DataReadBoundary from "./components/layout/DataReadBoundary";
 import { cn } from "@/lib/utils";
-import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { useTheme } from "next-themes";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
@@ -21,101 +21,21 @@ const VIEWER_NAV = [
 { name: "Agenda", page: "Agenda", icon: Calendar }];
 
 
-const PUBLIC_PAGES = ["entrar"];
-const ADMIN_ONLY_PAGES = ["Dashboard", "NewEntry", "Employees", "Clients", "ActivityTypes", "Reports", "AuditHistory", "Settings"];
-
 export default function Layout({ children, currentPageName }) {
-  const [employeeSession, setEmployeeSession] = useState(null);
-  const [platformUser, setPlatformUser] = useState(null);
-  const [sessionLoading, setSessionLoading] = useState(true);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { user: employeeSession, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const { theme, setTheme } = useTheme();
-
-  useEffect(() => {
-    const validateSession = async () => {
-      try {
-        const raw = sessionStorage.getItem("employeeSession");
-        if (raw) {
-          const session = JSON.parse(raw);
-          // Validate token server-side
-          if (session.token && session.id) {
-            try {
-              const res = await base44.functions.invoke("validateSession", {
-                token: session.token,
-                employeeId: session.id
-              });
-              if (res.data?.valid) {
-                setEmployeeSession(res.data.session);
-                setSessionLoading(false);
-                return;
-              }
-            } catch (err) {
-              console.warn("validateSession call failed, using local session:", err);
-              // If server validation fails (e.g. no platform auth), trust local session
-              setEmployeeSession({
-                id: session.id,
-                name: session.name,
-                access_type: session.access_type || "viewer",
-                color: session.color
-              });
-              setSessionLoading(false);
-              return;
-            }
-          }
-          // Invalid session data — clear it
-          sessionStorage.removeItem("employeeSession");
-          setEmployeeSession(null);
-          setSessionLoading(false);
-          if (!PUBLIC_PAGES.includes(currentPageName)) {
-            navigate("/entrar");
-          }
-          return;
-        }
-      } catch {
-        sessionStorage.removeItem("employeeSession");
-      }
-      // No employee session — check platform user
-      try {
-        const user = await base44.auth.me();
-        setPlatformUser(user);
-      } catch {}
-      setSessionLoading(false);
-    };
-    validateSession();
-  }, [currentPageName]);
-
-  const isEmployeeViewer = employeeSession && employeeSession.access_type === "viewer";
-  const isEmployeeSupervisor = employeeSession && employeeSession.access_type === "supervisor";
-  const isEmployeeAdmin = employeeSession && employeeSession.access_type === "admin";
-  const isReadOnlyEmployee = isEmployeeViewer || isEmployeeSupervisor;
-  const isPlatformUser = !!platformUser;
-  const isFullAdmin = isPlatformUser || isEmployeeAdmin;
+  const isEmployeeAdmin = employeeSession?.access_type === "admin";
+  const isFullAdmin = isEmployeeAdmin;
 
   const ROOT_PAGES = ["Dashboard", "Agenda", "Reports"];
   const isChildRoute = !ROOT_PAGES.includes(currentPageName) && currentPageName !== "entrar";
 
   const navItems = isFullAdmin ? ADMIN_NAV : VIEWER_NAV;
 
-  useEffect(() => {
-    if (isReadOnlyEmployee && ADMIN_ONLY_PAGES.includes(currentPageName)) {
-      navigate("/");
-    }
-  }, [isReadOnlyEmployee, currentPageName]);
-
-  useEffect(() => {
-    if (sessionLoading) return;
-    if (!employeeSession && !platformUser && !PUBLIC_PAGES.includes(currentPageName)) {
-      navigate("/entrar");
-    }
-  }, [sessionLoading, employeeSession, platformUser, currentPageName]);
-
-  const handleLogout = () => {
-    sessionStorage.removeItem("employeeSession");
-    setEmployeeSession(null);
-    setPlatformUser(null);
-    navigate("/entrar");
+  const handleLogout = async () => {
+    try { await logout(); }
+    finally { navigate("/entrar", { replace: true }); }
   };
 
   if (currentPageName === "entrar") return <>{children}</>;
@@ -144,7 +64,7 @@ export default function Layout({ children, currentPageName }) {
                   <ChevronLeft className="w-5 h-5" />
                 </button>
               }
-              <img src="https://media.base44.com/images/public/69ac93e375e4e4093788aef0/98ca518dd_Varejarte_logo_png__2_.png"
+              <img src="/brand/varejarte.png"
               alt="Varejarte" className="py-8 h-28 w-auto object-contain" />
             </div>
 
@@ -174,17 +94,17 @@ export default function Layout({ children, currentPageName }) {
             {/* Right side: settings gear + user + logout */}
             <div className="flex items-center gap-2">
               {/* User badge */}
-              {(employeeSession || platformUser) &&
+              {employeeSession &&
               <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-accent/50 text-xs">
                   <div
                   className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
                   style={{ backgroundColor: employeeSession?.color || "hsl(var(--primary))" }}>
-                    {(employeeSession?.name || platformUser?.full_name || "U")?.charAt(0)}
+                    {(employeeSession?.name || "U")?.charAt(0)}
                   </div>
                   <span className="font-medium text-foreground truncate max-w-[100px]">
-                    {employeeSession?.name || platformUser?.full_name || "Usuário"}
+                    {employeeSession?.name || "Usuário"}
                   </span>
-                  {(isEmployeeAdmin || isPlatformUser) ?
+                  {isEmployeeAdmin ?
                 <Shield className="w-3 h-3 text-primary shrink-0" /> :
                 <Eye className="w-3 h-3 text-muted-foreground shrink-0" />}
                 </div>
@@ -268,18 +188,11 @@ export default function Layout({ children, currentPageName }) {
         className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 md:pb-6"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 4.5rem)" }}>
         
-        {children}
+        <DataReadBoundary>{children}</DataReadBoundary>
       </main>
 
       <MobileNav currentPageName={currentPageName} isFullAdmin={isFullAdmin} />
 
-      <ConfirmDialog
-        open={showDeleteConfirm}
-        onOpenChange={setShowDeleteConfirm}
-        title="Excluir Conta"
-        description="Tem certeza que deseja excluir sua conta? Esta ação é irreversível e todos os seus dados serão perdidos."
-        onConfirm={() => {setShowDeleteConfirm(false);navigate("/entrar");}} />
-      
     </div>);
 
 }

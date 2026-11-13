@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -64,21 +64,21 @@ export default function NewEntryDrawer({ open, onOpenChange, initialDate = "" })
 
   const { data: employees = [] } = useQuery({
     queryKey: ["employees"],
-    queryFn: () => base44.entities.Employee.list(),
+    queryFn: () => api.entities.Employee.list(),
   });
 
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
-    queryFn: () => base44.entities.Client.list(),
+    queryFn: () => api.entities.Client.list(),
   });
 
   const { data: activityTypes = [] } = useQuery({
     queryKey: ["activityTypes"],
-    queryFn: () => base44.entities.ActivityType.list(),
+    queryFn: () => api.entities.ActivityType.list(),
   });
 
   const createActivityTypeMutation = useMutation({
-    mutationFn: (data) => base44.entities.ActivityType.create(data),
+    mutationFn: (data) => api.entities.ActivityType.create(data),
     onSuccess: (created) => {
       queryClient.invalidateQueries({ queryKey: ["activityTypes"] });
       setForm((prev) => ({ ...prev, activity: created.name }));
@@ -89,7 +89,7 @@ export default function NewEntryDrawer({ open, onOpenChange, initialDate = "" })
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.ScheduleEntry.create(data),
+    mutationFn: (data) => api.entities.ScheduleEntry.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["entries"] });
       toast.success("Atividade adicionada com sucesso!");

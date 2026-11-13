@@ -179,3 +179,100 @@ test('initial import refuses a nonempty destination and leaves existing data int
     assert.equal((await imported.query('select count(*)::int as count from base44_migration.records')).rows[0].count, 0);
   } finally { await imported.close(); }
 });
+
+test('client writes normalize nested inputs and preserve private values on a partial update', async () => {
+  await asUser(admin, async () => {
+    const input = {
+      company_name: 'Cliente novo teste', monthly_contract_value: '123.45',
+      contacts: [{ name: 'Contato teste', birthday_day: '12', birthday_month: '3' }],
+      monthly_activities: [{ activity_type: 'Visita', quantity: '3', duration_minutes: '' }],
+      branches: [{ name: 'Centro', monthly_activities: [{ activity_type: 'Treinamento', quantity: '2', duration_minutes: '90' }] }],
+    };
+    const saved = (await db.query('select public.save_client(null, $1::jsonb) as record', [JSON.stringify(input)])).rows[0].record;
+    assert.equal(saved.monthly_contract_value, 123.45);
+    assert.equal(saved.contacts[0].birthday_day, 12);
+    assert.equal(saved.monthly_activities[0].quantity, 3);
+    assert.equal(saved.monthly_activities[0].duration_minutes, 0);
+    assert.equal(saved.branches[0].active, true);
+    assert.equal(saved.branches[0].monthly_activities[0].duration_minutes, 90);
+    const updated = (await db.query("select public.save_client($1, '{\"company_name\":\"Renomeado\"}') as record", [saved.id])).rows[0].record;
+    assert.equal(updated.monthly_contract_value, 123.45);
+    assert.deepEqual(updated.contacts, saved.contacts);
+    const cleared = (await db.query("select public.save_client($1, '{\"monthly_contract_value\":\"\",\"contacts\":[]}'::jsonb) as record", [saved.id])).rows[0].record;
+    assert.equal(cleared.monthly_contract_value, null);
+    assert.deepEqual(cleared.contacts, []);
+  });
+});
+
+test('invalid private client data rolls back the public client creation atomically', async () => {
+  await asUser(admin, async () => {
+    const before = (await db.query('select count(*)::int as n from public.clients')).rows[0].n;
+    await db.exec('savepoint invalid_client');
+    await assert.rejects(db.query('select public.save_client(null, $1::jsonb)', [JSON.stringify({
+      company_name: 'Must roll back', contacts: [{ name: 'Teste', birthday_month: 13 }],
+    })]), error => error.code === '22023');
+    await db.exec('rollback to invalid_client; release invalid_client');
+    assert.equal((await db.query('select count(*)::int as n from public.clients')).rows[0].n, before);
+  });
+});
+
+test('non-administrators cannot call mutations, audit or full backup even with valid identities', async () => {
+  for (const identity of [supervisor, viewer, stranger]) await asUser(identity, async () => {
+    await denied("select public.save_client(null, '{\"company_name\":\"Não permitido\"}')");
+    await denied("select public.remove_client('c1')");
+    await denied("select public.remove_agenda_record('ScheduleEntry', 's1')");
+    await denied("select public.append_audit_log('Teste', 'cliente')");
+    await denied('select public.export_backup()');
+  });
+});
+
+test('client renaming preserves historical branch labels even after branch removal', async () => {
+  await asUser(admin, async () => {
+    await db.exec(`update public.schedule_entries set client_name = case id
+      when 's1' then 'Cliente sintético — Centro - Loja 2'
+      when 's2' then 'Cliente sintético - Filial antiga' else 'Cliente sintético' end`);
+    await db.exec(`select public.save_client('c1', '{"company_name":"Novo — Nome","branches":[]}')`);
+    assert.deepEqual((await db.query('select client_name from public.schedule_entries order by id')).rows.map(row => row.client_name), [
+      'Novo — Nome — Centro - Loja 2', 'Novo — Nome - Filial antiga', 'Novo — Nome',
+    ]);
+  });
+});
+
+test('client removal keeps completed schedule history and preserves rows for backup', async () => {
+  await asUser(admin, async () => {
+    await db.exec("update public.schedule_entries set status = 'realizado' where id = 's1'");
+    await db.exec("select public.remove_client('c1')");
+    assert.deepEqual((await db.query('select id from public.schedule_entries')).rows, [{ id: 's1' }]);
+    assert.equal((await db.query("select id from public.clients where id = 'c1'")).rows.length, 0);
+    const snapshot = (await db.query('select public.export_backup() as snapshot')).rows[0].snapshot;
+    assert.equal(snapshot.ScheduleEntry.length, 3);
+    assert.ok(snapshot.Client.find(client => client.id === 'c1').deleted_at);
+  });
+});
+
+test('schedule and activity removal use soft deletion without requiring visibility of a deleted row', async () => {
+  await asUser(admin, async () => {
+    assert.deepEqual((await db.query("select public.remove_agenda_record('ScheduleEntry', 's3') as result")).rows[0].result, { success: true });
+    assert.equal((await db.query("select id from public.schedule_entries where id = 's3'")).rows.length, 0);
+    const snapshot = (await db.query('select public.export_backup() as snapshot')).rows[0].snapshot;
+    assert.ok(snapshot.ScheduleEntry.find(row => row.id === 's3').deleted_at);
+    await db.exec("insert into public.activity_types(id, name) values ('temporary', 'Teste')");
+    await db.exec("select public.remove_agenda_record('ActivityType', 'temporary')");
+    assert.equal((await db.query("select id from public.activity_types where id = 'temporary'")).rows.length, 0);
+  });
+});
+
+test('audit assigns the server-owned actor and backup includes private business data without auth secrets', async () => {
+  await asUser(admin, async () => {
+    await denied("insert into public.audit_logs(action, category, user_name) values ('Teste', 'cliente', 'Nome forjado')");
+    const audit = (await db.query("select public.append_audit_log('Criou teste', 'cliente') as record")).rows[0].record;
+    assert.equal(audit.user_name, 'Administrador teste');
+    assert.equal(audit.created_by_id, admin);
+    const snapshot = (await db.query('select public.export_backup() as snapshot')).rows[0].snapshot;
+    assert.deepEqual(Object.keys(snapshot).sort(), ['ActivityType', 'AuditLog', 'Client', 'Employee', 'ScheduleEntry']);
+    assert.equal(snapshot.Employee.find(row => row.id === 'e3').monthly_salary, 300);
+    assert.equal(snapshot.Client.find(row => row.id === 'c1').contacts[0].name, 'Contato teste');
+    assert.equal(snapshot.AuditLog.length, 1);
+    assert.doesNotMatch(JSON.stringify(snapshot), /password|session_token|access_token|refresh_token|auth_user_id/);
+  });
+});

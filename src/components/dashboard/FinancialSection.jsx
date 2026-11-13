@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/formatCurrency";
-import { DollarSign, TrendingUp, Users, Building2, Activity, Clock, CheckCircle2, BarChart2 } from "lucide-react";
+import { DollarSign, Users, Building2, Activity, Clock, CheckCircle2, BarChart2 } from "lucide-react";
 
 const MONTHLY_HOURS = 176;
 

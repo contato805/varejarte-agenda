@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { format, startOfMonth, endOfMonth, subMonths, startOfWeek, endOfWeek, addWeeks } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 const PERIODS = [
   { key: "month", label: "Este Mês" },

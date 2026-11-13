@@ -1,13 +1,12 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PullToRefresh from "@/components/ui/PullToRefresh";
 import { Calendar, Users, Building2, Activity } from "lucide-react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import StatCard from "../components/dashboard/StatCard";
 import ActivityChart from "../components/dashboard/ActivityChart";
-import EmployeeBreakdown from "../components/dashboard/EmployeeBreakdown";
 import TopClientsChart from "../components/dashboard/TopClientsChart";
 import ClientActivitySummary from "../components/dashboard/ClientActivitySummary";
 import DashboardFilter, { getPeriodRange } from "../components/dashboard/DashboardFilter";
@@ -40,7 +39,7 @@ export default function Dashboard() {
 
   const { data: rawEntries = [], isLoading: loadingEntries } = useQuery({
     queryKey: ["entries", rangeStart, rangeEnd],
-    queryFn: () => base44.entities.ScheduleEntry.filter({
+    queryFn: () => api.entities.ScheduleEntry.filter({
       date: { $gte: rangeStart, $lte: rangeEnd }
     }),
     enabled: !!rangeStart && !!rangeEnd,
@@ -51,19 +50,19 @@ export default function Dashboard() {
   // All entries for alerts (no date filter)
   const { data: rawAllEntries = [] } = useQuery({
     queryKey: ["allEntries"],
-    queryFn: () => base44.entities.ScheduleEntry.list("-date", 2000),
+    queryFn: () => api.entities.ScheduleEntry.list("-date"),
   });
 
   const allEntries = useMemo(() => normalizeEntryStatus(rawAllEntries), [rawAllEntries]);
 
   const { data: employees = [], isLoading: loadingEmp } = useQuery({
     queryKey: ["employees"],
-    queryFn: () => base44.entities.Employee.list(),
+    queryFn: () => api.entities.Employee.list(),
   });
 
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
-    queryFn: () => base44.entities.Client.list(),
+    queryFn: () => api.entities.Client.list(),
   });
 
   const isLoading = loadingEntries || loadingEmp;

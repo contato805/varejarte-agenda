@@ -50,10 +50,14 @@ A organização vazia criada anteriormente não foi apagada ou alterada.
    nem alterar faturamento, acessos ou projetos de outras aplicações. Confirmar
    titularidade e plano antes de criar organização/projeto. Não repetir a tentativa
    anterior e não remover ou pausar recursos existentes para abrir espaço.
-4. **Migrar o backend — pendente.** Adaptar entidades, `clientCrud`, importação,
-   login/sessão e chamadas Base44, preservando IDs, filiais, filtros e relatórios.
-5. **Migrar as rotinas — pendente.** Conclusão automática, sincronização do nome
-   do cliente e backup diário exigem substitutos para workflows, arquivos e e-mail.
+4. **Migrar o backend — iniciado.** As telas usam o adaptador Supabase, sem SDK,
+   plugin ou fallback Base44. Login/sessão dependem de Auth e vínculo no servidor;
+   clientes, auditoria, remoção lógica e backup manual têm RPCs candidatas.
+   Funções de colaboradores/importação, bootstrap de acessos e validação real
+   continuam pendentes. Contratos e limites em `RUNTIME.md`.
+5. **Migrar as rotinas — iniciado.** Sincronização do nome do cliente foi escrita
+   como trigger e ensaiada localmente preservando filiais históricas. Conclusão
+   automática e backup diário ainda exigem substitutos e execução agendada.
 6. **Validar e trocar — pendente.** Testar administrador, supervisor e visualizador;
    conferir contagens e relações no destino; comparar agenda, edição, filtros,
    indicadores e relatórios. Reexportar dados durante uma janela sem novas escritas
@@ -79,27 +83,32 @@ publique os arquivos em Git, artefatos de CI ou logs.
 ## Autenticação
 
 O código original compara senhas de colaboradores e administra sessões em
-Employee. Esses campos não devem integrar as tabelas acessíveis pelo navegador.
-A troca precisa definir Supabase Auth e o vínculo entre usuário e colaborador,
-incluindo o acesso administrativo hoje fornecido pela conta de plataforma Base44.
+Employee. Esses campos não integram as tabelas candidatas. A cópia agora usa
+Supabase Auth e vínculo privado entre usuário e colaborador/proprietário;
+implementar provisionamento e validar com sessões reais ainda é necessário.
 Não importar senhas antigas em texto nem tokens de sessão para o novo sistema.
 Nenhuma conta foi criada e nenhum convite ou e-mail foi enviado.
 
 ## Validações deste marco
 
-- `npm run build`: passou com o código recuperado. Isso comprova compilação;
-  as chamadas de dados e autenticação ainda usam Base44.
+- `npm run build`: passou com o runtime convertido, sem SDK/plugin Base44.
+  Configuração ausente mostra “Ambiente em preparação”, sem chamar a origem.
 - Testes Python: nove passaram (preparação e conversões de dados).
-- Testes SQL locais: 11 passaram, cobrindo os três perfis, conta sem vínculo,
+- Testes SQL locais: 18 passaram, cobrindo os três perfis, conta sem vínculo,
   colaborador desativado, acesso anônimo, upgrade do staging, datas sem deslocamento
   e com microssegundos, importação atômica, repetição sem sobrescrita e recusa de
-  destino já populado. Fixtures usam identidades sintéticas, não sessões reais.
+  destino já populado; clientes atômicos, normalização, filiais históricas,
+  remoção lógica, autor de auditoria e backup restrito. Identidades são sintéticas.
+- Testes do adaptador/sessão/interface: 21 passaram, com SDK real e rede simulada,
+  componentes React e cache. Cobrem leitura acima do limite da API, dados incompletos,
+  recusa de servidor incorreto antes da senha, sessão legada forjada, limpeza de
+  cache e resposta atrasada após logout, abas por perfil e aviso de dados incompletos.
 - Validação dos CSVs reais: passou; inventário agregado em `data-inventory.json`.
 - Importação dos 7.826 registros em PostgreSQL/WASM descartável: paridade de todos
   os campos projetados, valores financeiros privados, contatos e snapshots
   sanitizados conferida; nova execução preservou uma edição posterior simulada.
-- `npm run lint`: 50 erros preexistentes, todos de imports não utilizados.
-  Mantidos para preservar a origem, sem limpeza geral durante a recuperação.
+- `npm run lint`: passou. Removidos apenas imports sem uso herdados da origem;
+  fonte original preservada na tag e no arquivo local de recuperação.
 - Replay da stack Supabase completa, Auth/API reais e importação remota: pendentes.
 - Teste completo da aplicação fora do Base44: pendente.
 

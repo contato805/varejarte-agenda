@@ -1,7 +1,7 @@
 import React from "react";
 import {
   startOfMonth, endOfMonth, startOfWeek, endOfWeek,
-  eachDayOfInterval, format, isSameMonth, isSameDay, isToday
+  eachDayOfInterval, format, isSameMonth, isToday
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";

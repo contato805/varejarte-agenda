@@ -33,8 +33,9 @@ Os leitores `employee_records()` e `client_records()` acrescentam os atributos
 privados somente para administradores. As políticas nas tabelas continuam
 obrigatórias; tabelas privadas e vínculos não têm acesso direto pelo navegador.
 Exclusão física não é concedida aos papéis do navegador. O modelo prevê
-`deleted_at`; as operações administrativas de remoção, gravação financeira,
-gerenciamento de acesso e auditoria verificada ainda precisam ser implementadas.
+`deleted_at`; remoção lógica, gravação privada de clientes, auditoria com autor
+do servidor e backup administrativo foram preparados na terceira migração.
+Gerenciamento de colaboradores/Auth continua pendente. Contratos em `RUNTIME.md`.
 
 ## Importação inicial
 
@@ -63,7 +64,8 @@ explicitamente. O snapshot também mantém os valores literais originais.
 
 ## Alcance das provas atuais
 
-11 testes SQL cobrem papéis, negações, upgrade do staging e limites da importação;
+18 testes SQL cobrem papéis, negações, upgrade do staging, limites da importação,
+cliente atômico, normalização, filiais históricas, remoção lógica, auditoria e backup;
 nove testes Python cobrem CSVs, credenciais e conversões. A carga real em memória
 conferiu as cinco entidades e todos os campos projetados, salários, contratos,
 contatos e 7.826 snapshots sanitizados. A repetição preservou uma edição posterior.

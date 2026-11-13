@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download, Loader2, FileText } from "lucide-react";
@@ -10,7 +10,7 @@ export default function Settings() {
   const handleDownloadMd = async () => {
     setLoading(true);
     try {
-      const res = await base44.functions.invoke("generateFullBackupMd", {});
+      const res = await api.functions.invoke("generateFullBackupMd", {});
       const { markdown, date } = res.data;
 
       const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });

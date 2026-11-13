@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -34,17 +34,6 @@ const EMPTY_FORM = {
   activity_notes: "",
 };
 
-function getSession() {
-  try {
-    const raw = sessionStorage.getItem("employeeSession");
-    if (raw) {
-      const s = JSON.parse(raw);
-      return { sessionToken: s.token, sessionEmployeeId: s.id };
-    }
-  } catch {}
-  return {};
-}
-
 export default function Clients() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -55,7 +44,7 @@ export default function Clients() {
   const { data: activityTypes = [] } = useQuery({
     queryKey: ["activityTypes"],
     queryFn: async () => {
-      const res = await base44.functions.invoke("clientCrud", { action: "listActivityTypes", ...getSession() });
+      const res = await api.functions.invoke("clientCrud", { action: "listActivityTypes" });
       return res.data.activityTypes || [];
     },
   });
@@ -63,13 +52,13 @@ export default function Clients() {
   const { data: clients = [], isLoading } = useQuery({
     queryKey: ["clients"],
     queryFn: async () => {
-      const res = await base44.functions.invoke("clientCrud", { action: "list", ...getSession() });
+      const res = await api.functions.invoke("clientCrud", { action: "list" });
       return res.data.clients || [];
     },
   });
 
   const createMut = useMutation({
-    mutationFn: (d) => base44.functions.invoke("clientCrud", { action: "create", data: d, ...getSession() }),
+    mutationFn: (d) => api.functions.invoke("clientCrud", { action: "create", data: d }),
     onMutate: async (newData) => {
       await queryClient.cancelQueries({ queryKey: ["clients"] });
       const previous = queryClient.getQueryData(["clients"]);
@@ -94,7 +83,7 @@ export default function Clients() {
   });
 
   const updateMut = useMutation({
-    mutationFn: ({ id, data }) => base44.functions.invoke("clientCrud", { action: "update", id, data, ...getSession() }),
+    mutationFn: ({ id, data }) => api.functions.invoke("clientCrud", { action: "update", id, data }),
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: ["clients"] });
       const previous = queryClient.getQueryData(["clients"]);
@@ -118,7 +107,7 @@ export default function Clients() {
   });
 
   const deleteMut = useMutation({
-    mutationFn: (cl) => base44.functions.invoke("clientCrud", { action: "delete", id: cl.id, ...getSession() }),
+    mutationFn: (cl) => api.functions.invoke("clientCrud", { action: "delete", id: cl.id }),
     onSuccess: (_data, cl) => {
       queryClient.setQueryData(["clients"], (old) => (old || []).filter((c) => c.id !== cl.id));
       toast.success("Cliente e atividades pendentes removidos!");

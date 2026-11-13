@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ArrowUpDown, ArrowUp, ArrowDown, Download } from "lucide-react";
+import { ArrowUp, ArrowDown, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import jsPDF from "jspdf";
 

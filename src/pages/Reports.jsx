@@ -1,11 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery } from "@tanstack/react-query";
 import { format, startOfMonth, endOfMonth, subMonths, addMonths, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { FileText, Calendar, Building2, User, Zap, ChevronDown, Check, Download, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import ReportEmployees from "@/components/reports/ReportEmployees";
 import ReportClients from "@/components/reports/ReportClients";
@@ -139,21 +138,20 @@ export default function Reports() {
       if (!dateStart || !dateEnd) return [];
       const cutoff30 = format(subDays(new Date(dateStart + "T12:00:00"), 30), "yyyy-MM-dd");
       const earliest = cutoff30 < dateStart ? cutoff30 : dateStart;
-      return base44.entities.ScheduleEntry.filter(
+      return api.entities.ScheduleEntry.filter(
         { date: { $gte: earliest, $lte: dateEnd } },
-        "-date",
-        2000
+        "-date"
       );
     },
     enabled: !!(dateStart && dateEnd),
   });
   const { data: clients = [] } = useQuery({
     queryKey: ["clients"],
-    queryFn: () => base44.entities.Client.list(),
+    queryFn: () => api.entities.Client.list(),
   });
   const { data: employees = [] } = useQuery({
     queryKey: ["employees"],
-    queryFn: () => base44.entities.Employee.list(),
+    queryFn: () => api.entities.Employee.list(),
   });
 
   const filtered = useMemo(() => {

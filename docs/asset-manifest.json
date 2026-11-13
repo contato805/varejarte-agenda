@@ -1,0 +1,15 @@
+{
+  "assets": [
+    {
+      "path": "public/brand/varejarte-branco.png",
+      "bytes": 224386,
+      "sha256": "efa361032a16ef6e2b0b653815b342f888638df33bad1da7aa714eceff9ceccd"
+    },
+    {
+      "path": "public/brand/varejarte.png",
+      "bytes": 110502,
+      "sha256": "91e671736c42e7b4a71bfcb8befb8b710235864c04a64b2db61cfc4ce82f8f12"
+    }
+  ],
+  "origin": "Public Base44 media referenced by the recovered source; copied read-only."
+}

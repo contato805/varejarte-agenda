@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { api } from "@/api/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Trash2, Pencil, Users, Eye, EyeOff, Shield, Lock, DollarSign, AlertTriangle, CheckCircle2, Circle, ClipboardList } from "lucide-react";
+import { Plus, Trash2, Pencil, Users, Eye, EyeOff, Shield, Lock, AlertTriangle, CheckCircle2, Circle, ClipboardList } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -38,7 +38,7 @@ export default function Employees() {
 
   const { data: employees = [], isLoading } = useQuery({
     queryKey: ["employees"],
-    queryFn: () => base44.entities.Employee.list(),
+    queryFn: () => api.entities.Employee.list(),
   });
 
   // Colors already in use (excluding the one being edited)
@@ -47,7 +47,7 @@ export default function Employees() {
     .map((e) => e.color);
 
   const createMut = useMutation({
-    mutationFn: (d) => base44.entities.Employee.create(d),
+    mutationFn: (d) => api.entities.Employee.create(d),
     onSuccess: async (_data, variables) => {
       await queryClient.invalidateQueries({ queryKey: ["employees"] });
       toast.success("Colaborador adicionado!");
@@ -57,7 +57,7 @@ export default function Employees() {
   });
 
   const updateMut = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Employee.update(id, data),
+    mutationFn: ({ id, data }) => api.entities.Employee.update(id, data),
     onSuccess: async (_data, variables) => {
       await queryClient.invalidateQueries({ queryKey: ["employees"] });
       toast.success("Colaborador atualizado!");
@@ -67,7 +67,7 @@ export default function Employees() {
   });
 
   const deleteMut = useMutation({
-    mutationFn: (id) => base44.entities.Employee.delete(id),
+    mutationFn: (id) => api.entities.Employee.delete(id),
     onSuccess: async (_data, deletedId) => {
       const emp = employees.find(e => e.id === deletedId);
       await queryClient.invalidateQueries({ queryKey: ["employees"] });
@@ -89,7 +89,8 @@ export default function Employees() {
     if (!form.role.trim()) errors.push("Cargo é obrigatório");
     if (!form.color) errors.push("Selecione uma cor");
     if (!form.login.trim()) errors.push("Login é obrigatório");
-    if (!form.password.trim()) errors.push("Senha é obrigatória");
+    if (!editing && !form.password) errors.push("Senha é obrigatória");
+    if (form.password && form.password.length < 8) errors.push("A senha deve ter pelo menos 8 caracteres");
     if (form.monthly_salary === "" || form.monthly_salary === null || form.monthly_salary === undefined) errors.push("Salário mensal é obrigatório");
     return errors;
   };
@@ -105,8 +106,9 @@ export default function Employees() {
     setFormErrors([]);
     // Remove empty optional fields so the API doesn't receive invalid empty strings
     const cleanForm = { ...form };
-    if (cleanForm.birthday_day === "" || cleanForm.birthday_day === null) delete cleanForm.birthday_day;
-    if (cleanForm.birthday_month === "" || cleanForm.birthday_month === null) delete cleanForm.birthday_month;
+    if (cleanForm.birthday_day === "") cleanForm.birthday_day = null;
+    if (cleanForm.birthday_month === "") cleanForm.birthday_month = null;
+    if (editing && !cleanForm.password) delete cleanForm.password;
     
     if (editing) {
       updateMut.mutate({ id: editing.id, data: cleanForm });
@@ -123,7 +125,7 @@ export default function Employees() {
       color: emp.color,
       access_type: emp.access_type || "viewer",
       login: emp.login || "",
-      password: emp.password || "",
+      password: "",
       monthly_salary: emp.monthly_salary ?? "",
       birthday_day: emp.birthday_day ?? "",
       birthday_month: emp.birthday_month ?? "",
@@ -337,7 +339,7 @@ export default function Employees() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs">Senha</Label>
+                    <Label className="text-xs">{editing ? "Nova senha (opcional)" : "Senha"}</Label>
                     <div className="relative">
                       <Input
                         type={showPass ? "text" : "password"}
