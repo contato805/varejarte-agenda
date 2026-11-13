@@ -8,8 +8,8 @@ funções e três workflows. Hashes do original em `source-manifest.json`.
 O projeto local tem Git próprio, separado do repositório da pasta superior.
 
 Destino do código: https://github.com/contato805/varejarte-agenda (privado).
-Destino dos dados: **pendente de uma identidade Supabase exclusiva indicada pelo
-usuário**. A sessão global desta máquina foi identificada como uma conta distinta
+Destino dos dados: **conta exclusiva `varejarteagenda@gmail.com`, indicada pelo
+usuário; autenticação ainda pendente**. A sessão global desta máquina foi identificada como uma conta distinta
 da conta que o usuário esperava usar no navegador. A organização **Varejarte**
 (`hptgenccwkznoahivtab`) foi criada nessa sessão antes da identificação e continua
 vazia: o provisionamento do projeto foi recusado por uma pendência de cobrança
@@ -43,8 +43,8 @@ A organização vazia criada anteriormente não foi apagada ou alterada.
 3. **Preparar Supabase — iniciado.** Configuração local e migration de staging
    privado disponíveis. A migration NÃO foi aplicada nem ensaiada em banco.
    Docker não estava ativo nesta máquina. Não há tabelas públicas do produto ainda.
-   Próximo passo: receber do usuário a identidade exclusiva do Varejarte e
-   autenticar um perfil próprio do projeto. Não usar a sessão global existente
+   Próximo passo: o usuário concluir a entrada na conta `varejarteagenda@gmail.com`
+   e então autenticar um perfil próprio do projeto. Não usar a sessão global existente
    nem alterar faturamento, acessos ou projetos de outras aplicações. Confirmar
    titularidade e plano antes de criar organização/projeto. Não repetir a tentativa
    anterior e não remover ou pausar recursos existentes para abrir espaço.

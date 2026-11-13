@@ -16,6 +16,10 @@
   sessão está vazia e não é um destino aprovado para a infraestrutura definitiva.
   Aguardar a identidade exclusiva indicada pelo usuário e configurar um perfil
   de acesso próprio do projeto, sem alterar ou encerrar sessões de outros apps.
+- Identidade exclusiva indicada pelo usuário: `varejarteagenda@gmail.com`.
+  Antes de provisionar recursos, confirmar essa identidade na sessão realmente
+  autenticada. E-mail preenchido na tela de login não comprova autenticação.
+  Não aceitar fallback para a credencial global da máquina ao configurar o perfil.
 - Antes de qualquer operação remota, confirmar identidade, organização e projeto
   do Varejarte. A entrega a terceiros deve conceder acesso somente aos recursos
   deste projeto, sem compartilhar contas pessoais ou credenciais globais.
