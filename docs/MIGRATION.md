@@ -8,17 +8,29 @@ funções e três workflows. Hashes do original em `source-manifest.json`.
 O projeto local tem Git próprio, separado do repositório da pasta superior.
 
 Destino do código: https://github.com/contato805/varejarte-agenda (privado).
-Destino dos dados: projeto Supabase exclusivo na organização **Varejarte**, criada
-no plano gratuito em 13/11/2026 (`hptgenccwkznoahivtab`). A criação do projeto
-`varejarte-agenda` em São Paulo foi recusada pelo Supabase por uma pendência de
-cobrança em outra organização da conta. A listagem posterior confirmou que nenhum
-projeto Varejarte foi provisionado. Não houve alteração de plano nem pagamento.
+Destino dos dados: **pendente de uma identidade Supabase exclusiva indicada pelo
+usuário**. A sessão global desta máquina foi identificada como uma conta distinta
+da conta que o usuário esperava usar no navegador. A organização **Varejarte**
+(`hptgenccwkznoahivtab`) foi criada nessa sessão antes da identificação e continua
+vazia: o provisionamento do projeto foi recusado por uma pendência de cobrança
+nessa conta. Essa organização não será usada como destino definitivo sem resolver
+a titularidade e a separação exigidas pelo usuário. Não houve alteração de plano,
+pagamento, provisionamento de banco ou envio de dados para o Supabase.
 Nenhum projeto Maestro ou Deskcomm foi alterado.
 
 **Restrição do usuário:** o aplicativo Base44 está em uso pela equipe e deve
 permanecer integralmente intacto. A origem é somente leitura; desenvolvimento e
 testes com escrita devem ocorrer apenas nas cópias isoladas. A troca do aplicativo
 em uso depende de autorização explícita. Essa regra também consta em `AGENTS.md`.
+
+**Independência e entrega a terceiros:** código, banco, autenticação, hospedagem,
+domínio, arquivos, envio de e-mail e segredos devem pertencer exclusivamente ao
+Varejarte. Não compartilhar serviços, credenciais ou dependências de outros apps.
+O repositório GitHub já é separado e privado; uma futura transferência ou convite
+deve conceder acesso apenas a esse repositório. Contas pessoais e sessões globais
+não fazem parte da entrega. O Supabase deve usar uma identidade própria, mantendo
+o plano gratuito, e acesso de desenvolvimento separado das sessões dos outros apps.
+A organização vazia criada anteriormente não foi apagada ou alterada.
 
 ## Fluxo e critérios de avanço
 
@@ -31,11 +43,11 @@ em uso depende de autorização explícita. Essa regra também consta em `AGENTS
 3. **Preparar Supabase — iniciado.** Configuração local e migration de staging
    privado disponíveis. A migration NÃO foi aplicada nem ensaiada em banco.
    Docker não estava ativo nesta máquina. Não há tabelas públicas do produto ainda.
-   Organização Varejarte criada; provisionamento remoto bloqueado pela conta.
-   Próximo passo: regularizar a pendência pelo painel Supabase e então criar o
-   projeto nessa organização, mantendo o plano gratuito. Não repetir a criação
-   enquanto a condição externa persistir; antes de tentar, listar os projetos
-   para evitar duplicação. Não remover ou pausar outros projetos para abrir espaço.
+   Próximo passo: receber do usuário a identidade exclusiva do Varejarte e
+   autenticar um perfil próprio do projeto. Não usar a sessão global existente
+   nem alterar faturamento, acessos ou projetos de outras aplicações. Confirmar
+   titularidade e plano antes de criar organização/projeto. Não repetir a tentativa
+   anterior e não remover ou pausar recursos existentes para abrir espaço.
 4. **Migrar o backend — pendente.** Adaptar entidades, `clientCrud`, importação,
    login/sessão e chamadas Base44, preservando IDs, filiais, filtros e relatórios.
 5. **Migrar as rotinas — pendente.** Conclusão automática, sincronização do nome
