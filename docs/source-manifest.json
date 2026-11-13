@@ -670,8 +670,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "c75837da5f4553b705ed4e22db5ca5d9592687933ebca59efd11504928169588",
-      "bytes": 424
+      "sha256": "13814f5692c03de13ec9150f167193f2a67b6b5028977eff076d926981ff0b59",
+      "bytes": 295
     },
     {
       "path": "components.json",
