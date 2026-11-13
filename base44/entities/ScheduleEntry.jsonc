@@ -1,0 +1,65 @@
+{
+  "name": "ScheduleEntry",
+  "type": "object",
+  "properties": {
+    "employee_id": {
+      "type": "string",
+      "description": "ID do colaborador"
+    },
+    "employee_name": {
+      "type": "string",
+      "description": "Nome do colaborador (desnormalizado)"
+    },
+    "client_id": {
+      "type": "string",
+      "description": "ID do cliente"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nome do cliente (desnormalizado)"
+    },
+    "activity": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o da atividade"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Data da atividade"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Hor\u00e1rio de in\u00edcio (HH:mm)"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Hor\u00e1rio de t\u00e9rmino (HH:mm)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Observa\u00e7\u00f5es adicionais"
+    },
+    "employee_color": {
+      "type": "string",
+      "description": "Cor do colaborador (hex)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "agendado",
+        "realizado",
+        "cancelado"
+      ],
+      "default": "agendado",
+      "description": "Status da atividade"
+    }
+  },
+  "required": [
+    "employee_id",
+    "client_id",
+    "activity",
+    "date",
+    "start_time",
+    "end_time"
+  ]
+}

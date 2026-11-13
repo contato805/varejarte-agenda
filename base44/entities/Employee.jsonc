@@ -1,0 +1,65 @@
+{
+  "name": "Employee",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nome do colaborador"
+    },
+    "color": {
+      "type": "string",
+      "description": "Cor de identifica\u00e7\u00e3o do colaborador (hex)"
+    },
+    "role": {
+      "type": "string",
+      "description": "Cargo do colaborador"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Se o colaborador est\u00e1 ativo"
+    },
+    "access_type": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "supervisor",
+        "viewer"
+      ],
+      "default": "viewer",
+      "description": "Tipo de acesso: admin = acesso total, supervisor = visualiza todas as agendas sem editar, viewer = somente visualiza\u00e7\u00e3o da pr\u00f3pria agenda"
+    },
+    "login": {
+      "type": "string",
+      "description": "Login de acesso do colaborador"
+    },
+    "password": {
+      "type": "string",
+      "description": "Senha de acesso do colaborador"
+    },
+    "monthly_salary": {
+      "type": "number",
+      "description": "Sal\u00e1rio mensal (base de c\u00e1lculo do custo/hora)"
+    },
+    "birthday_day": {
+      "type": "number",
+      "description": "Dia do anivers\u00e1rio"
+    },
+    "birthday_month": {
+      "type": "number",
+      "description": "M\u00eas do anivers\u00e1rio (1-12)"
+    },
+    "session_token": {
+      "type": "string",
+      "description": "Token de sess\u00e3o ativo (gerenciado pelo sistema)"
+    },
+    "session_expires": {
+      "type": "string",
+      "description": "Data de expira\u00e7\u00e3o da sess\u00e3o (ISO)"
+    }
+  },
+  "required": [
+    "name",
+    "color"
+  ]
+}

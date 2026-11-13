@@ -1,0 +1,35 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o da a\u00e7\u00e3o realizada"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "colaborador",
+        "cliente",
+        "atividade",
+        "agendamento",
+        "relatorio",
+        "cronograma"
+      ],
+      "description": "Categoria da a\u00e7\u00e3o"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Nome do usu\u00e1rio que realizou a a\u00e7\u00e3o"
+    },
+    "details": {
+      "type": "string",
+      "description": "Detalhes adicionais"
+    }
+  },
+  "required": [
+    "action",
+    "category",
+    "user_name"
+  ]
+}
